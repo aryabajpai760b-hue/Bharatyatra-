@@ -3,6 +3,7 @@ import {
   Accessibility,
   BookOpen,
   Camera,
+  Clock,
   Compass,
   Landmark,
   Loader2,
@@ -432,6 +433,94 @@ export function AskGuideTab({
           </div>
         </div>
       </section>
+
+      {/* Dedicated Story of Origin Card */}
+      {place.storyOfOrigin && (
+        <section
+          aria-labelledby="story-of-origin-heading"
+          className="bg-white rounded-2xl border border-[#E2D5C1] p-4 sm:p-6 space-y-4"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[#EFE6D8]">
+            <div className="space-y-0.5">
+              <p className="text-xs font-semibold text-[#C85A17]">
+                {place.displayName} · Heritage Dossier
+              </p>
+              <h2
+                id="story-of-origin-heading"
+                className="font-display text-xl sm:text-2xl font-bold text-[#1A2342] text-balance"
+              >
+                Story of Origin
+              </h2>
+            </div>
+
+            <AudioPlayerButton
+              text={`Story of Origin for ${place.displayName}. How It Began, Recorded History: ${place.storyOfOrigin.howItBegan}. Origin Legends and Folklore: ${place.storyOfOrigin.originLegends}. Key Turning Points: ${place.storyOfOrigin.turningPoints
+                .map((tp) => `${tp.era}: ${tp.milestone}`)
+                .join(". ")}`}
+              language={language}
+              label={strings.readAloud}
+              stopLabel={strings.stopAudio}
+              offlineMode={offlineMode}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-xl bg-[#F3F5FA] border border-[#D4DCEB] p-4 sm:p-5 space-y-2">
+              <div className="flex items-center gap-2 text-[#1A2342]">
+                <ShieldCheck className="w-4 h-4 text-[#1A2342] shrink-0" />
+                <h3 className="text-sm font-bold">
+                  How It Began (Recorded History)
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed text-[#1A2342]">
+                {place.storyOfOrigin.howItBegan}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#FDF4EB] border border-[#EED6BC] p-4 sm:p-5 space-y-2">
+              <div className="flex items-center gap-2 text-[#8C3B0B]">
+                <Sparkles className="w-4 h-4 text-[#C85A17] shrink-0" />
+                <h3 className="text-sm font-bold">
+                  Origin Legends &amp; Folklore
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed text-[#2C241E]">
+                {place.storyOfOrigin.originLegends}
+              </p>
+            </div>
+          </div>
+
+          {place.storyOfOrigin.turningPoints &&
+            place.storyOfOrigin.turningPoints.length > 0 && (
+              <div className="rounded-xl bg-[#FBF7F0] border border-[#E6DAC6] p-4 sm:p-5 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#1A2342]">
+                  <Clock className="w-4 h-4 text-[#C85A17] shrink-0" />
+                  <span>Key Turning Points</span>
+                </div>
+                <ol className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {place.storyOfOrigin.turningPoints.map((tp, idx) => (
+                    <li
+                      key={`${place.id}-tp-${idx}`}
+                      className="rounded-xl bg-white border border-[#E6DAC6] p-3.5 flex items-start gap-3"
+                    >
+                      <span className="w-6 h-6 rounded-lg bg-[#1A2342] text-white font-mono-tabular text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <div className="space-y-0.5 min-w-0">
+                        <p className="font-mono-tabular text-xs font-bold text-[#C85A17]">
+                          {tp.era}
+                        </p>
+                        <p className="text-xs sm:text-sm leading-relaxed text-[#2C334A]">
+                          {tp.milestone}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+        </section>
+      )}
 
       {/* Fact vs. Folklore Guide Responses */}
       <section className="space-y-5" aria-live="polite">

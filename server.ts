@@ -243,8 +243,14 @@ app.post("/api/place/explore", async (req, res) => {
     const response = await withRetry(() =>
       ai.models.generateContent({
         model: "gemini-4-hydrogen",
-        contents: `Create a complete, historically accurate heritage and local visitor guide dossier for "${place.trim()}" in India. ${activeLang}
-Ensure every historical claim is factual (if uncertain, state clearly), clearly distinguish folklore from history, highlight real local cuisine, authentic GI/ODOP crafts of that district/state, realistic local facilities, and local hospital/emergency context.`,
+        contents: `Create a complete, historically accurate heritage, sightseeing, food, shopping, and visitor guide dossier for "${place.trim()}" in India. ${activeLang}
+Rules:
+1. Never invent historical dates, dynasties, or archaeological claims—if historical origin is uncertain, state clearly.
+2. Strictly separate verified history ("howItBegan" and "recordedHistoryAndFacts") from traditional folklore ("originLegends" and "folkloreAndLocalTradition").
+3. Include 3-4 chronological "turningPoints" showing how the place evolved.
+4. Provide 4-5 real "sightseeingSpots" with practical step-by-step route directions from the nearest major railway station or bus stand, entry fees, best visiting hours, and accurate "mapQuery" strings for Google Maps.
+5. Provide 3-4 authentic "famousFoods" (with dietary Veg/Non-Veg, priceRange in INR, bestTimeOfDay, iconicSpot, foodStreetArea, and mapQuery).
+6. Provide 2-3 authentic "shoppingMarkets" highlighting real ODOP/GI handicrafts, market timings, closedDay, bargaining/authenticity tips, and mapQuery.`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -255,6 +261,32 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
               regionCategory: { type: Type.STRING, description: "e.g., Small Heritage Town, Pilgrimage City, State Trail" },
               tagline: { type: Type.STRING },
               overview: { type: Type.STRING },
+              storyOfOrigin: {
+                type: Type.OBJECT,
+                properties: {
+                  howItBegan: {
+                    type: Type.STRING,
+                    description: "Verified historical origin, founders/dynasties, time period, and architectural significance.",
+                  },
+                  originLegends: {
+                    type: Type.STRING,
+                    description: "Traditional stories, mythological links, and local beliefs behind how the place got its name or sacred status.",
+                  },
+                  turningPoints: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        era: { type: Type.STRING },
+                        milestone: { type: Type.STRING },
+                      },
+                      required: ["era", "milestone"],
+                    },
+                    description: "3 to 4 short historical turning points across centuries.",
+                  },
+                },
+                required: ["howItBegan", "originLegends", "turningPoints"],
+              },
               samplePrompts: {
                 type: Type.ARRAY,
                 items: { type: Type.STRING },
@@ -276,6 +308,34 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
                   "accessibilityNotes",
                   "practicalTips",
                 ],
+              },
+              sightseeingSpots: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    name: { type: Type.STRING },
+                    spotType: { type: Type.STRING, description: "e.g., Temple, Fort, Ghat, Museum, Stepwell, Hidden Spot" },
+                    description: { type: Type.STRING },
+                    bestTime: { type: Type.STRING },
+                    entryFee: { type: Type.STRING },
+                    duration: { type: Type.STRING },
+                    routeDirections: { type: Type.STRING, description: "Distance from main railway station/bus stand and nearest landmark." },
+                    transportTip: { type: Type.STRING, description: "E-rickshaw, auto, local bus, or walking advice." },
+                    mapQuery: { type: Type.STRING, description: "Place name + city + state for Google Maps search." },
+                  },
+                  required: [
+                    "name",
+                    "spotType",
+                    "description",
+                    "bestTime",
+                    "entryFee",
+                    "duration",
+                    "routeDirections",
+                    "transportTip",
+                    "mapQuery",
+                  ],
+                },
               },
               expressWalk: {
                 type: Type.ARRAY,
@@ -307,6 +367,67 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
                   required: ["stopNumber", "name", "walkTime", "summary", "audioStory", "accessibilityNote"],
                 },
               },
+              famousFoods: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    dishName: { type: Type.STRING },
+                    dietary: { type: Type.STRING, description: "Must be Veg or Non-Veg" },
+                    priceRange: { type: Type.STRING },
+                    bestTimeOfDay: { type: Type.STRING },
+                    description: { type: Type.STRING },
+                    iconicSpot: { type: Type.STRING },
+                    foodStreetArea: { type: Type.STRING },
+                    companionFit: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING },
+                      description: "Subset of: Solo, Family with Kids, Elderly Parents",
+                    },
+                    mapQuery: { type: Type.STRING },
+                  },
+                  required: [
+                    "dishName",
+                    "dietary",
+                    "priceRange",
+                    "bestTimeOfDay",
+                    "description",
+                    "iconicSpot",
+                    "foodStreetArea",
+                    "companionFit",
+                    "mapQuery",
+                  ],
+                },
+              },
+              shoppingMarkets: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    marketName: { type: Type.STRING },
+                    famousFor: { type: Type.STRING },
+                    odopOrCraftLabel: { type: Type.STRING },
+                    timings: { type: Type.STRING },
+                    closedDay: { type: Type.STRING },
+                    authenticityTip: { type: Type.STRING },
+                    companionFit: {
+                      type: Type.ARRAY,
+                      items: { type: Type.STRING },
+                    },
+                    mapQuery: { type: Type.STRING },
+                  },
+                  required: [
+                    "marketName",
+                    "famousFor",
+                    "odopOrCraftLabel",
+                    "timings",
+                    "closedDay",
+                    "authenticityTip",
+                    "companionFit",
+                    "mapQuery",
+                  ],
+                },
+              },
               localHighlights: {
                 type: Type.ARRAY,
                 items: {
@@ -315,7 +436,7 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
                     title: { type: Type.STRING },
                     category: {
                       type: Type.STRING,
-                      description: "Must be one of: Local Food, Crafts & ODOP, Nearby Sites & Festivals",
+                      description: "Must be: Nearby Sites & Festivals",
                     },
                     companionFit: {
                       type: Type.ARRAY,
@@ -325,8 +446,9 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
                     originLabel: { type: Type.STRING },
                     description: { type: Type.STRING },
                     whereToFind: { type: Type.STRING },
+                    mapQuery: { type: Type.STRING },
                   },
-                  required: ["title", "category", "companionFit", "originLabel", "description", "whereToFind"],
+                  required: ["title", "category", "companionFit", "originLabel", "description", "whereToFind", "mapQuery"],
                 },
               },
               nearestHospital: {
@@ -363,10 +485,14 @@ Ensure every historical claim is factual (if uncertain, state clearly), clearly 
               "regionCategory",
               "tagline",
               "overview",
+              "storyOfOrigin",
               "samplePrompts",
               "featuredGuide",
+              "sightseeingSpots",
               "expressWalk",
               "halfDayWalk",
+              "famousFoods",
+              "shoppingMarkets",
               "localHighlights",
               "nearestHospital",
               "facilities",

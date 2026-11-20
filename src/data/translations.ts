@@ -66,8 +66,8 @@ export const ALL_LANGUAGES: { value: IndianLanguage; label: string; native: stri
 
 const EN_STRINGS: UIStrings = {
   tabAsk: "Ask & Scan",
-  tabWalks: "Walks",
-  tabLocal: "Food & ODOP",
+  tabWalks: "Sites & Walks",
+  tabLocal: "Food & Shop",
   tabFacilities: "Help & Facilities",
   tabInsights: "Insights",
   largeText: "Large Text",
@@ -99,8 +99,8 @@ const EN_STRINGS: UIStrings = {
 const BILINGUAL_STRINGS: UIStrings = {
   ...EN_STRINGS,
   tabAsk: "Ask · पूछें",
-  tabWalks: "Walks · सैर",
-  tabLocal: "Food & ODOP",
+  tabWalks: "Sites · सैर",
+  tabLocal: "Food & Shop",
   tabFacilities: "Help · सुविधाएं",
   tabInsights: "Insights",
   recordedHistory: "Recorded History & Facts · प्रमाणित इतिहास",
@@ -112,8 +112,8 @@ const BILINGUAL_STRINGS: UIStrings = {
 
 const HI_STRINGS: UIStrings = {
   tabAsk: "पूछें व स्कैन",
-  tabWalks: "पैदल यात्रा",
-  tabLocal: "भोजन व शिल्प",
+  tabWalks: "दर्शनीय व सैर",
+  tabLocal: "भोजन व बाज़ार",
   tabFacilities: "मदद व सुविधा",
   tabInsights: "पर्यटन डेटा",
   largeText: "बड़ा फ़ॉन्ट",

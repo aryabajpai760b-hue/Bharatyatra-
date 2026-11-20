@@ -30,9 +30,15 @@ export function TopBar({
   return (
     <header className="sticky top-0 z-40 bg-[#FBF7F0]/95 backdrop-blur-md border-b border-[#E2D5C1]">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Brand Wordmark */}
+        {/* Brand Logo & Wordmark */}
         <div className="flex items-center gap-2 shrink-0">
-          <span className="font-display text-lg sm:text-xl font-bold tracking-tight text-[#1A2342] whitespace-nowrap">
+          <img
+            src="/assets/aistudio/Bharatyatra_app_logo___20_Nov_2026__6.40_pm_20261120_184121_0000_bc2a0035.png"
+            alt="BharatYatra AI"
+            referrerPolicy="no-referrer"
+            className="h-9 w-9 sm:h-10 sm:w-10 object-contain rounded-lg border border-[#E2D5C1] bg-[#FCF7EC] shrink-0"
+          />
+          <span className="hidden sm:inline font-display text-lg sm:text-xl font-bold tracking-tight text-[#1A2342] whitespace-nowrap">
             BharatYatra AI
           </span>
         </div>

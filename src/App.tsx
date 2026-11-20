@@ -13,7 +13,12 @@ import {
   TabId,
   VisitorStyleMode,
 } from "./types";
-import { CURATED_PLACES, IMG_TEMPLE_CARVING } from "./data/placesCatalog";
+import {
+  CURATED_PLACES,
+  findCuratedPlace,
+  IMG_CRAFTS_ODOP,
+  IMG_TEMPLE_CARVING,
+} from "./data/placesCatalog";
 import { getUIStrings } from "./data/translations";
 import { TopBar } from "./components/TopBar";
 import { PlaceExplorerModal } from "./components/PlaceExplorerModal";
@@ -72,11 +77,7 @@ export default function App() {
     const trimmed = query.trim();
     if (!trimmed) return;
 
-    const existingCurated = CURATED_PLACES.find(
-      (p) =>
-        p.name.toLowerCase() === trimmed.toLowerCase() ||
-        p.displayName.toLowerCase() === trimmed.toLowerCase()
-    );
+    const existingCurated = findCuratedPlace(trimmed);
     if (existingCurated) {
       setActivePlace(existingCurated);
       setIsPlaceModalOpen(false);
@@ -116,6 +117,12 @@ export default function App() {
         tagline: data.tagline || "Fact vs. Folklore heritage & local companion",
         overview: data.overview || "",
         heroImage: IMG_TEMPLE_CARVING,
+        secondaryImage: IMG_CRAFTS_ODOP,
+        storyOfOrigin: data.storyOfOrigin || {
+          howItBegan: data.featuredGuide?.recordedHistoryAndFacts || data.overview || "",
+          originLegends: data.featuredGuide?.folkloreAndLocalTradition || "",
+          turningPoints: [],
+        },
         samplePrompts:
           Array.isArray(data.samplePrompts) && data.samplePrompts.length >= 3
             ? data.samplePrompts.slice(0, 3)
@@ -125,16 +132,31 @@ export default function App() {
                 `Explain heritage carvings or crafts of ${trimmed}`,
               ],
         featuredGuide: data.featuredGuide,
-        expressWalk: data.expressWalk || [],
-        halfDayWalk: data.halfDayWalk || [],
-        localHighlights: data.localHighlights || [],
+        sightseeingSpots: Array.isArray(data.sightseeingSpots) ? data.sightseeingSpots : [],
+        expressWalk: Array.isArray(data.expressWalk) ? data.expressWalk : [],
+        halfDayWalk: Array.isArray(data.halfDayWalk) ? data.halfDayWalk : [],
+        famousFoods: Array.isArray(data.famousFoods) ? data.famousFoods : [],
+        shoppingMarkets: Array.isArray(data.shoppingMarkets) ? data.shoppingMarkets : [],
+        localHighlights: Array.isArray(data.localHighlights)
+          ? data.localHighlights.map((item: Record<string, unknown>) => ({
+              title: String(item.title || ""),
+              category: "Nearby Sites & Festivals" as const,
+              companionFit: Array.isArray(item.companionFit)
+                ? item.companionFit
+                : ["Solo", "Family with Kids", "Elderly Parents"],
+              originLabel: String(item.originLabel || "Regional Heritage"),
+              description: String(item.description || ""),
+              whereToFind: String(item.whereToFind || trimmed),
+              mapQuery: item.mapQuery ? String(item.mapQuery) : undefined,
+            }))
+          : [],
         nearestHospital: data.nearestHospital || {
           name: "Nearest District Government Hospital",
           area: trimmed,
           phone: "108",
           note: "Dial 108 or 112 for 24x7 ambulance dispatch.",
         },
-        facilities: data.facilities || [],
+        facilities: Array.isArray(data.facilities) ? data.facilities : [],
       };
 
       setCustomPlaces((prev) => ({ ...prev, [cacheKey]: generatedDossier }));
@@ -317,6 +339,7 @@ export default function App() {
         isOpen={isPlaceModalOpen}
         onClose={() => setIsPlaceModalOpen(false)}
         activePlaceId={activePlace.id}
+        activeStateName={activePlace.state}
         onSelectCuratedPlace={handleSelectCuratedPlace}
         onExploreCustomPlace={handleExploreCustomPlace}
         isLoadingCustom={isLoadingCustomPlace}
