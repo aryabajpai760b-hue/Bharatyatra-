@@ -1,0 +1,6 @@
+{
+  "name": "BharatYatra AI",
+  "description": "Pan-India Heritage & Local Companion for Indian states, union territories, heritage cities, and small towns with Fact vs. Folklore guidance, audio tours, ODOP crafts, and offline support.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
